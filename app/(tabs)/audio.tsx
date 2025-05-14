@@ -34,38 +34,41 @@ export default function AudioScreen() {
   };
 
   const processAudio = async () => {
-    if (!selectedAudio) return;
-  
-    setIsProcessing(true);
-    setAudioResult(null);
-  
-    try {
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      const fileInfo = await FileSystem.getInfoAsync(selectedAudio);
-      
-      // Add type check for file size
-      if (!fileInfo.exists || fileInfo.size === undefined) {
-        throw new Error('File not found or size unavailable');
-      }
-      
-      const fileSize = (fileInfo.size / (1024 * 1024)).toFixed(2);
-  
-      const mockResult: ProcessingResult = {
-        success: true,
-        output: `Audio processed!\nSize: ${fileSize} MB\nPath: ${selectedAudio}\nMock analysis: 440Hz frequency`,
-      };
-  
-      setAudioResult(mockResult);
-    } catch (error) {
-      setAudioResult({
-        success: false,
-        error: 'Processing failed: ' + (error instanceof Error ? error.message : 'Unknown error'),
-      });
-    } finally {
-      setIsProcessing(false);
-    }
-  };
+  if (!selectedAudio) return;
+
+  setIsProcessing(true);
+  setAudioResult(null);
+
+  try {
+    const formData = new FormData();
+    formData.append('file', {
+      uri: selectedAudio,
+      name: selectedAudio.split('/').pop(),
+      type: 'audio/mpeg',
+    } as any);
+
+    const response = await fetch('http://192.168.100.208:5000/api/process', {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+
+    const result = await response.json();
+    
+    if (!response.ok) throw new Error(result.error || 'Processing failed');
+    
+    setAudioResult(result);
+  } catch (error) {
+    setAudioResult({
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+  } finally {
+    setIsProcessing(false);
+  }
+};
 
   return (
     <View style={[styles.container, { backgroundColor: isDarkMode ? '#121212' : '#f5f5f5' }]}>
@@ -110,7 +113,6 @@ export default function AudioScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     padding: 20,
   },
   title: {

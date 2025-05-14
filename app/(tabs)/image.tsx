@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator, Alert, useColorScheme } from 'react-native';
-import * as FileSystem from 'expo-file-system';
 import * as ImagePicker from 'expo-image-picker';
 import * as MediaLibrary from 'expo-media-library';
+import React, { useState } from 'react';
+import { ActivityIndicator, Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, useColorScheme, View } from 'react-native';
 
 type ProcessingResult = {
   success: boolean;
@@ -44,44 +43,52 @@ export default function ImageScreen() {
   };
 
   const processImage = async () => {
-    if (!selectedImage) return;
+  if (!selectedImage) return;
   
-    setIsProcessing(true);
-    setImageResult(null);
-  
-    try {
-      // Simulate processing delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      const fileInfo = await FileSystem.getInfoAsync(selectedImage);
-      
-      // Add type check for file size
-      if (!fileInfo.exists || fileInfo.size === undefined) {
-        throw new Error('File not found or size unavailable');
-      }
-      
-      const fileSize = (fileInfo.size / (1024 * 1024)).toFixed(2);
-  
-      const mockResult: ProcessingResult = {
-        success: true,
-        output: `Image processed!\nSize: ${fileSize} MB\nPath: ${selectedImage}\nMock analysis: 3 objects detected`,
-      };
-  
-      setImageResult(mockResult);
-    } catch (error) {
-      setImageResult({
-        success: false,
-        error: 'Processing failed: ' + (error instanceof Error ? error.message : 'Unknown error'),
-      });
-    } finally {
-      setIsProcessing(false);
-    }
-  };
+  setIsProcessing(true);
+  setImageResult(null);
+
+  try {
+    const formData = new FormData();
+    formData.append('file', {
+      uri: selectedImage,
+      name: selectedImage.split('/').pop(),
+      type: 'image/jpeg',
+    } as any);
+
+    const response = await fetch('http://192.168.100.208:5000/api/process', {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+
+    const result = await response.json();
+    
+    if (!response.ok) throw new Error(result.error || 'Processing failed');
+    
+    setImageResult(result);
+  } catch (error) {
+    setImageResult({
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+  } finally {
+    setIsProcessing(false);
+  }
+};
 
   return (
-    <View style={[styles.container, { backgroundColor: isDarkMode ? '#121212' : '#f5f5f5' }]}>
+    <ScrollView
+      contentContainerStyle={[
+        styles.container,
+        { backgroundColor: isDarkMode ? '#121212' : '#f5f5f5' }
+      ]}
+      keyboardShouldPersistTaps="handled"
+    >
       <Text style={[styles.title, textColor]}>Image Processing</Text>
-      
+
       <TouchableOpacity style={styles.button} onPress={selectImage}>
         <Text style={styles.buttonText}>Select Image</Text>
       </TouchableOpacity>
@@ -112,18 +119,23 @@ export default function ImageScreen() {
           <Text style={[styles.resultTitle, textColor]}>
             {imageResult.success ? 'Results' : 'Error'}
           </Text>
-          <Text style={[styles.resultText, { color: imageResult.success ? '#4CAF50' : '#F44336' }]}>
+          <Text
+            style={[
+              styles.resultText,
+              { color: imageResult.success ? '#4CAF50' : '#F44336' }
+            ]}
+          >
             {imageResult.success ? imageResult.output : imageResult.error}
           </Text>
         </View>
       )}
-    </View>
+    </ScrollView>
   );
+
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     padding: 20,
   },
   title: {
