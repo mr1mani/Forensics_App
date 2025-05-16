@@ -1,4 +1,3 @@
-// In @/components/Collapsible.tsx or wherever your Collapsible is defined
 import React, { useState } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
@@ -10,7 +9,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 interface CollapsibleProps {
   title: string;
   children: React.ReactNode;
-  initialCollapsed?: boolean; // Added the missing prop with optional flag
+  initialCollapsed?: boolean;
 }
 
 export function Collapsible({ title, children, initialCollapsed = true }: CollapsibleProps) {
