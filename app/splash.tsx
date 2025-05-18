@@ -11,9 +11,7 @@ export default function SplashScreen() {
       toValue: 1,
       duration: 2000,
       useNativeDriver: true,
-    }).start(() => {
-      router.replace('/(tabs)');
-    });
+    }).start();
   }, []);
 
   return (

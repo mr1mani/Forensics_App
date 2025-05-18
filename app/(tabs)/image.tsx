@@ -2,6 +2,7 @@ import * as ImagePicker from 'expo-image-picker';
 import * as MediaLibrary from 'expo-media-library';
 import React, { useState } from 'react';
 import { ActivityIndicator, Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, useColorScheme, View } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type ProcessingResult = {
   success: boolean;
@@ -68,15 +69,49 @@ export default function ImageScreen() {
     
     if (!response.ok) throw new Error(result.error || 'Processing failed');
     
+    // Add this after successful processing in processImage()
+    if (result.success) {
+
+      try {
+        const newReport = {
+          type: 'image',
+          timestamp: Date.now(),
+          result: {
+            output: result.output,
+            inputUri: selectedImage,
+          }
+        };
+        
+        const existingReports = await AsyncStorage.getItem('forensic-reports');
+        const reports = existingReports ? JSON.parse(existingReports) : [];
+        reports.unshift(newReport); // Add new report at beginning
+        await AsyncStorage.setItem('forensic-reports', JSON.stringify(reports));
+        
+        // SUCCESS ALERT
+        Alert.alert('✅ Success', 'Image analysis saved to reports!');
+      
+      } catch (storageError) {
+        console.error('Failed to save report:', storageError);
+        // ERROR ALERT
+        Alert.alert('❌ Error', storageError instanceof Error ? storageError.message : 'Failed to save image-processing report');
+      }
+    }
+
     setImageResult(result);
+
   } catch (error) {
+
     setImageResult({
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error'
     });
+
   } finally {
+
     setIsProcessing(false);
+  
   }
+
 };
 
   return (

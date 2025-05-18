@@ -1,6 +1,8 @@
+import { SettingsProvider } from '@/contexts/SettingsContext';
 import { Stack } from 'expo-router';
+import { useEffect, useState } from 'react';
 import SplashScreen from './splash';
-import { useState, useEffect } from 'react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 export default function RootLayout() {
 
@@ -18,9 +20,14 @@ export default function RootLayout() {
   }
 
   return (
-    <Stack>
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-    </Stack>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SettingsProvider>
+        <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="+not-found" />
+        </Stack>
+      </SettingsProvider>
+    </GestureHandlerRootView>
   );
 }
 

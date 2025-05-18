@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert, useColorScheme } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as DocumentPicker from 'expo-document-picker';
-import * as FileSystem from 'expo-file-system';
+import React, { useState } from 'react';
+import { ActivityIndicator, Alert, StyleSheet, Text, TouchableOpacity, useColorScheme, View } from 'react-native';
 
 type ProcessingResult = {
   success: boolean;
@@ -59,6 +59,33 @@ export default function AudioScreen() {
     
     if (!response.ok) throw new Error(result.error || 'Processing failed');
     
+    // Add this after successful processing in processAudio()
+    if (result.success) {
+      try {
+        const newReport = {
+          type: 'audio', 
+          timestamp: Date.now(),
+          result: {
+            output: result.output,
+            inputUri: selectedAudio
+          }
+        };
+        
+        const existingReports = await AsyncStorage.getItem('forensic-reports');
+        const reports = existingReports ? JSON.parse(existingReports) : [];
+        reports.unshift(newReport);
+        await AsyncStorage.setItem('forensic-reports', JSON.stringify(reports));
+
+        // SUCCESS ALERT
+        Alert.alert('✅ Success', 'Audio analysis saved to reports!');
+
+      } catch (storageError) {
+        console.error('Failed to save report:', storageError);
+        // ERROR ALERT
+        Alert.alert('❌ Error', storageError instanceof Error ? storageError.message : 'Failed to save audio-processing report');
+      }
+    }
+
     setAudioResult(result);
   } catch (error) {
     setAudioResult({

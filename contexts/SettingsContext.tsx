@@ -1,9 +1,9 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-
+import { Appearance, Platform } from 'react-native';
 import { safeStorage } from '@/utils/storage';
 
 type Settings = {
-  theme: 'light' | 'dark';
+  systemDarkMode: boolean;
   fontSize: 'small' | 'medium' | 'large';
 };
 
@@ -12,20 +12,28 @@ type SettingsContextType = {
   updateSettings: (newSettings: Partial<Settings>) => void;
 };
 
-const SettingsContext = createContext<SettingsContextType>({} as SettingsContextType);
+const defaultSettings: Settings = {
+  systemDarkMode: Appearance.getColorScheme() === 'dark',
+  fontSize: 'medium'
+};
+
+const SettingsContext = createContext<SettingsContextType>({
+  settings: defaultSettings,
+  updateSettings: () => {}
+});
 
 export function SettingsProvider({ children }: { children: React.ReactNode }) {
-  const [settings, setSettings] = useState<Settings>({
-    theme: 'light',
-    fontSize: 'medium'
-  });
+  const [settings, setSettings] = useState<Settings>(defaultSettings);
 
   useEffect(() => {
-    const loadSettings = async () => {
-      const stored = await safeStorage.getItem('app-settings');
-      if (stored) setSettings(JSON.parse(stored));
-    };
-    loadSettings();
+    const subscription = Appearance.addChangeListener(({ colorScheme }) => {
+      setSettings(prev => ({
+        ...prev,
+        systemDarkMode: colorScheme === 'dark'
+      }));
+    });
+    
+    return () => subscription.remove();
   }, []);
 
   const updateSettings = async (newSettings: Partial<Settings>) => {
@@ -42,19 +50,3 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
 }
 
 export const useSettings = () => useContext(SettingsContext);
-
-
-
-
-
-const loadSettings = async () => {
-  try {
-    const stored = await safeStorage.getItem('app-settings');
-    if (stored) {
-      const parsed: Settings = JSON.parse(stored);
-      setSettings(parsed);
-    }
-  } catch (error) {
-    console.error('Failed to load settings', error);
-  }
-};
