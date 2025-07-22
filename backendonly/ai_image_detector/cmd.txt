@@ -1,0 +1,1 @@
+C:/Python313/python.exe c:/Users/mrehm/OneDrive/Desktop/ai-image-detector/main.py "C:/Users/mrehm/OneDrive/Desktop/ai-image-detector/Testing3" --weights_folder "C:/Users/mrehm/OneDrive/Desktop/ai-image-detector/model"

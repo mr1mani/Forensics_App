@@ -1,0 +1,23 @@
+# Core web server dependencies
+flask
+flask-cors
+
+# Networking
+netifaces
+
+# Deep learning and ML
+torch
+transformers
+torchvision
+
+# Image processing
+Pillow
+matplotlib
+
+# Utility
+argparse
+
+glob2
+# (glob is built-in, but glob2 is a common external package if needed)
+
+# Add any other packages as needed
