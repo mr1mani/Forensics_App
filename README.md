@@ -1,50 +1,52 @@
-# Welcome to your Expo app 👋
+# Forensics App – Mobile Application for AI-Generated Content Detection
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+## Introduction
 
-## Get started
+The rapid advancement of deep learning and artificial intelligence (AI) has led to the rise of sophisticated methods for generating synthetic digital media. This presents new challenges in verifying the authenticity of audio and image content. To address this, we introduce the **Forensics App** — a mobile application designed to detect and analyze AI-generated or tampered visual and vocal data.
 
-1. Install dependencies
+## Objective
 
-   ```bash
-   npm install
-   ```
+To provide a robust mobile tool capable of verifying the authenticity of digital audio and images by identifying AI manipulation or forgery using modern forensic techniques and deep learning.
 
-2. Start the app
+## System Architecture
 
-   ```bash
-   npx expo start
-   ```
+The application is built using a **client-server architecture**:
 
-In the output, you'll find options to open the app in a
+- **Frontend:** Developed using **React Native (Expo)** for cross-platform mobile support.
+- **Backend:** A **Python Flask server** that acts as middleware between the frontend and the forensic models.
+- **Models:** Two separate AI models:
+  - One for analyzing **images**.
+  - One for analyzing **audio**.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## Key Features
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+### Visual Forensics
 
-## Get a fresh project
+- Pixel pattern and lighting anomaly detection
+- Metadata analysis
+- Error Level Analysis (ELA)
+- Detection of AI-generated image traits (e.g., irregular shadows, texture inconsistencies)
 
-When you're ready, run:
+### Audio Forensics
 
-```bash
-npm run reset-project
-```
+- Voice authenticity verification
+- Differentiation between real human speech and AI-generated speech using machine learning models
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Technologies Used
 
-## Learn more
+- **React Native (Expo)** – Mobile app development
+- **Python + Flask** – API server and model handler
+- **Deep Learning Models** – For image and voice classification
+- **Git LFS & BFG Repo-Cleaner** – For managing large model files (`.pth`, `.keras`)
+- **GitHub** – Code hosting and version control
 
-To learn more about developing your project with Expo, look at the following resources:
+## Applications
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+- Fake news detection
+- Media verification for journalism
+- Digital content validation for legal and academic purposes
+- Voice authentication in security-sensitive systems
 
-## Join the community
+## Conclusion
 
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+In an age where misinformation can spread rapidly through manipulated media, the **Forensics App** offers a critical solution. By leveraging deep learning and AI-powered forensics, it empowers users to distinguish between genuine and synthetic content, ensuring trust in digital communication.
